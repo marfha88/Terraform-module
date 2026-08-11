@@ -32,6 +32,8 @@ variable "sku_name" {
 variable "rbac_authorization_enabled" {
   description = "Whether RBAC authorization is enabled for the Key Vault. If true, access policies will be ignored."
   type        = bool
+  default     = true
+
 }
 
 variable "purge_protection_enabled" {
