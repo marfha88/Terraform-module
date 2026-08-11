@@ -1,10 +1,10 @@
-# Terraform Module Monorepo
+# Terraform Module
 
 ![CI](https://github.com/marfha88/Terraform-module/actions/workflows/terraform-module-ci.yml/badge.svg)
 ![License](https://img.shields.io/github/license/marfha88/Terraform-module)
 ![Latest Release](https://img.shields.io/github/v/release/marfha88/Terraform-module)
 
-A monorepo of reusable Azure Terraform modules. Each module is self-contained, versioned together via Git tags, and consumable directly from this repository without a private registry.
+A repo of reusable Azure Terraform modules. Each module is self-contained, versioned together via Git tags, and consumable directly from this repository without a private registry.
 
 ---
 
@@ -166,7 +166,7 @@ The CI pipeline (`terraform-module-ci.yml`) runs the first three steps automatic
 
 ## Versioning
 
-This monorepo uses **repository-level semantic versioning**. A single Git tag applies to all modules at once.
+This repo uses **repository-level semantic versioning**. A single Git tag applies to all modules at once.
 
 | Tag | When to use |
 |-----|-------------|
