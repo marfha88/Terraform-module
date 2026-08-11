@@ -1,0 +1,88 @@
+name: Terraform Module CI
+
+on:
+  pull_request:
+    paths:
+      - "modules/**"
+      - "examples/**"
+  push:
+    paths:
+      - "modules/**"
+      - "examples/**"
+
+jobs:
+  discover:
+    name: Discover Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.find.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find module directories
+        id: find
+        run: |
+          modules=$(find modules -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+
+  validate-modules:
+    name: Validate Module / ${{ matrix.module }}
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.6"
+
+      - name: terraform fmt
+        working-directory: modules/${{ matrix.module }}
+        run: terraform fmt -check -recursive
+
+      - name: terraform init
+        working-directory: modules/${{ matrix.module }}
+        run: terraform init -backend=false
+
+      - name: terraform validate
+        working-directory: modules/${{ matrix.module }}
+        run: terraform validate
+
+  validate-examples:
+    name: Validate Example / ${{ matrix.module }}
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check example exists
+        id: check
+        run: |
+          if [ -d "examples/${{ matrix.module }}" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: hashicorp/setup-terraform@v3
+        if: steps.check.outputs.exists == 'true'
+        with:
+          terraform_version: "~1.6"
+
+      - name: terraform init
+        if: steps.check.outputs.exists == 'true'
+        working-directory: examples/${{ matrix.module }}
+        run: terraform init -backend=false
+
+      - name: terraform validate
+        if: steps.check.outputs.exists == 'true'
+        working-directory: examples/${{ matrix.module }}
+        run: terraform validate
