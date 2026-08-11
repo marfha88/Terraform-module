@@ -1,0 +1,117 @@
+name: Terraform Module CI
+
+on:
+  pull_request:
+    paths:
+      - "modules/**"
+      - "examples/**"
+  push:
+    paths:
+      - "modules/**"
+      - "examples/**"
+
+jobs:
+  # ── Job 1: Discover module directories ─────────────────────────────────────
+  discover:
+    name: Discover modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.find.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find module directories
+        id: find
+        run: |
+          # Collect direct children of modules/ that contain at least one .tf file
+          dirs=$(find modules -mindepth 1 -maxdepth 1 -type d | sort)
+          json="["
+          first=true
+          for d in $dirs; do
+            if ls "$d"/*.tf 1>/dev/null 2>&1; then
+              if [ "$first" = true ]; then
+                first=false
+              else
+                json="${json},"
+              fi
+              json="${json}\"${d}\""
+            fi
+          done
+          json="${json}]"
+          echo "modules=${json}" >> "$GITHUB_OUTPUT"
+
+  # ── Job 2: Validate each module ────────────────────────────────────────────
+  validate-modules:
+    name: Validate module (${{ matrix.module }})
+    needs: discover
+    if: ${{ needs.discover.outputs.modules != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: terraform fmt -check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ matrix.module }}
+
+      - name: terraform init
+        run: terraform init -backend=false
+        working-directory: ${{ matrix.module }}
+
+      - name: terraform validate
+        run: terraform validate
+        working-directory: ${{ matrix.module }}
+
+  # ── Job 3: Validate matching example (if it exists) ────────────────────────
+  validate-examples:
+    name: Validate example (${{ matrix.module }})
+    needs: discover
+    if: ${{ needs.discover.outputs.modules != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine example path
+        id: example
+        run: |
+          module_name=$(basename "${{ matrix.module }}")
+          example_dir="examples/${module_name}"
+          if [ -d "${example_dir}" ] && ls "${example_dir}"/*.tf 1>/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "path=${example_dir}" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Terraform
+        if: steps.example.outputs.exists == 'true'
+        uses: hashicorp/setup-terraform@v3
+
+      - name: terraform fmt -check
+        if: steps.example.outputs.exists == 'true'
+        run: terraform fmt -check -recursive
+        working-directory: ${{ steps.example.outputs.path }}
+
+      - name: terraform init
+        if: steps.example.outputs.exists == 'true'
+        run: terraform init -backend=false
+        working-directory: ${{ steps.example.outputs.path }}
+
+      - name: terraform validate
+        if: steps.example.outputs.exists == 'true'
+        run: terraform validate
+        working-directory: ${{ steps.example.outputs.path }}
+
+      - name: No example found (skipped)
+        if: steps.example.outputs.exists == 'false'
+        run: echo "No example directory found for ${{ matrix.module }} — skipping."
