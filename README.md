@@ -57,18 +57,15 @@ This repository provides a collection of opinionated, production-ready Terraform
 ├── modules/
 │   ├── terraform_azurerm_resource_group/
 │   ├── terraform_azurerm_storage_account/
-│   └── terraform_azurerm_key_vault/
 └── examples/
     ├── terraform_azurerm_resource_group/
     ├── terraform_azurerm_storage_account/
-    └── terraform_azurerm_key_vault/
 ```
 
 Each module folder contains:
 
 | File | Purpose |
 |------|---------|
-| `versions.tf` | Terraform and provider version constraints |
 | `variables.tf` | Input declarations with validation |
 | `locals.tf` | Derived/computed values |
 | `main.tf` | Resource declarations |
@@ -109,18 +106,6 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags                     = { environment = "prod" }
-}
-```
-
-```hcl
-module "key_vault" {
-  source = "git::https://github.com/marfha88/Terraform-module.git//modules/terraform_azurerm_key_vault?ref=v1.0.0"
-
-  name                = "myapp-kv-prod"
-  resource_group_name = module.resource_group.name
-  location            = "westeurope"
-  tenant_id           = var.tenant_id
-  tags                = { environment = "prod" }
 }
 ```
 

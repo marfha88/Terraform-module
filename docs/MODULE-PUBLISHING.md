@@ -9,7 +9,6 @@ This guide explains how to author a new module and publish a release.
 
    | File | Purpose |
    |------|---------|
-   | `versions.tf` | Terraform and provider version constraints |
    | `variables.tf` | Input variable declarations with validation |
    | `locals.tf` | Computed/derived values |
    | `main.tf` | Resource declarations |
