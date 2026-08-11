@@ -1,5 +1,5 @@
 variable "name" {
-  description = "The name of the Key Vault. Must be globally unique, 3-24 characters, alphanumeric and hyphens, start with a letter, cannot start/end with a hyphen."
+  description = "The name of the Key Vault. Must be globally unique, 3-24 characters, alphanumeric and hyphens, start with a letter."
   type        = string
 
   validation {
