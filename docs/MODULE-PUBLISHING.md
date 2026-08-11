@@ -35,7 +35,7 @@ This guide explains how to author a new module and publish a release.
 2. Create and push a semver tag:
 
    ```bash
-   git tag v1.1.0 -m "Add Key Vault module"
+   git tag v1.1.0 -m "Add new module"
    git push origin v1.1.0
    ```
 

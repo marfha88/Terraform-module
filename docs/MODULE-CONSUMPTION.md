@@ -41,7 +41,6 @@ Always pin to a specific tag (e.g. `?ref=v1.0.0`) in production configurations. 
 |--------|------|
 | Resource Group | `modules/terraform_azurerm_resource_group` |
 | Storage Account | `modules/terraform_azurerm_storage_account` |
-| Key Vault | `modules/terraform_azurerm_key_vault` |
 
 ## Upgrading
 

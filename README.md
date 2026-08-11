@@ -38,7 +38,6 @@ This repository provides a collection of opinionated, production-ready Terraform
 |--------|-------------|-------------|
 | `terraform_azurerm_resource_group` | Azure Resource Group | `modules/terraform_azurerm_resource_group` |
 | `terraform_azurerm_storage_account` | Azure Storage Account | `modules/terraform_azurerm_storage_account` |
-| `terraform_azurerm_key_vault` | Azure Key Vault | `modules/terraform_azurerm_key_vault` |
 
 ---
 
@@ -56,12 +55,10 @@ This repository provides a collection of opinionated, production-ready Terraform
 │   └── GITHUB-APP-CONSUMPTION.md         # Consuming via a GitHub App token
 ├── modules/
 │   ├── terraform_azurerm_resource_group/
-│   ├── terraform_azurerm_storage_account/
-│   └── terraform_azurerm_key_vault/
+│   └── terraform_azurerm_storage_account/
 └── examples/
     ├── terraform_azurerm_resource_group/
-    ├── terraform_azurerm_storage_account/
-    └── terraform_azurerm_key_vault/
+    └── terraform_azurerm_storage_account/
 ```
 
 Each module folder contains:
@@ -109,18 +106,6 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags                     = { environment = "prod" }
-}
-```
-
-```hcl
-module "key_vault" {
-  source = "git::https://github.com/marfha88/Terraform-module.git//modules/terraform_azurerm_key_vault?ref=v1.0.0"
-
-  name                = "myapp-kv-prod"
-  resource_group_name = module.resource_group.name
-  location            = "westeurope"
-  tenant_id           = var.tenant_id
-  tags                = { environment = "prod" }
 }
 ```
 
@@ -177,7 +162,7 @@ This repo uses **repository-level semantic versioning**. A single Git tag applie
 **Creating a release:**
 
 ```bash
-git tag v1.1.0 -m "Add Key Vault module"
+git tag v1.1.0 -m "Add Storage Account module"
 git push origin v1.1.0
 ```
 
