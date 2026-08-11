@@ -16,6 +16,11 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "rbac_authorization_enabled" {
+  description = "Whether RBAC authorization is enabled for the Key Vault. If true, access policies will be ignored."
+  type        = bool
+}
+
 variable "tenant_id" {
   description = "The Azure AD tenant ID."
   type        = string
