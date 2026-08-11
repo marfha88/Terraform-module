@@ -41,13 +41,13 @@ variable "account_replication_type" {
 }
 
 variable "min_tls_version" {
-  description = "The minimum TLS version for the storage account. Valid values: TLS1_0, TLS1_1, TLS1_2."
+  description = "The minimum TLS version for the storage account. Only TLS1_2 is permitted; TLS1_0 and TLS1_1 are deprecated and insecure."
   type        = string
   default     = "TLS1_2"
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.min_tls_version)
-    error_message = "min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
+    condition     = var.min_tls_version == "TLS1_2"
+    error_message = "min_tls_version must be 'TLS1_2'. TLS1_0 and TLS1_1 are deprecated and insecure."
   }
 }
 
