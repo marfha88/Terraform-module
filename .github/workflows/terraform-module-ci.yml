@@ -50,6 +50,8 @@ jobs:
       fail-fast: false
       matrix:
         module: ${{ fromJson(needs.discover.outputs.modules) }}
+    env:
+      MODULE_DIR: ${{ matrix.module }}
     steps:
       - uses: actions/checkout@v4
 
@@ -58,15 +60,15 @@ jobs:
 
       - name: terraform fmt -check
         run: terraform fmt -check -recursive
-        working-directory: ${{ matrix.module }}
+        working-directory: ${{ env.MODULE_DIR }}
 
       - name: terraform init
         run: terraform init -backend=false
-        working-directory: ${{ matrix.module }}
+        working-directory: ${{ env.MODULE_DIR }}
 
       - name: terraform validate
         run: terraform validate
-        working-directory: ${{ matrix.module }}
+        working-directory: ${{ env.MODULE_DIR }}
 
   # ── Job 3: Validate matching example (if it exists) ────────────────────────
   validate-examples:
@@ -78,13 +80,15 @@ jobs:
       fail-fast: false
       matrix:
         module: ${{ fromJson(needs.discover.outputs.modules) }}
+    env:
+      MODULE_DIR: ${{ matrix.module }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Determine example path
         id: example
         run: |
-          module_name=$(basename "${{ matrix.module }}")
+          module_name=$(basename "$MODULE_DIR")
           example_dir="examples/${module_name}"
           if [ -d "${example_dir}" ] && ls "${example_dir}"/*.tf 1>/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"

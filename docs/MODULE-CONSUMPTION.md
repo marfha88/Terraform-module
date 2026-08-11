@@ -87,7 +87,6 @@ After running `terraform init`, Terraform records the downloaded module in `.ter
 ```gitignore
 # .gitignore
 .terraform/
-!.terraform.lock.hcl
 ```
 
 ---
