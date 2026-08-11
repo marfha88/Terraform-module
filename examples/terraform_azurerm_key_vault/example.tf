@@ -9,4 +9,5 @@ module "key_vault" {
   purge_protection_enabled   = var.purge_protection_enabled
   soft_delete_retention_days = var.soft_delete_retention_days
   tags                       = var.tags
+  rbac_authorization_enabled = true
 }
